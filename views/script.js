@@ -1,4 +1,4 @@
-var orginalBoard;
+var originalBoard;
 const Player = "0";
 const aiPlayer = "X";
 const winCombos = [
@@ -16,8 +16,10 @@ const cells = document.querySelectorAll(".cell");
 startGame();
 
 function startGame() {
+  //clears the board
   document.querySelector(".endgame").style.display = "none";
-  orginalBoard = Array.from(Array(9).keys()); //fill number into array
+  //fill number into array, and add eventlistener when clicking
+  originalBoard = Array.from(Array(9).keys());
   for (var i = 0; i < cells.length; i++) {
     cells[i].innerText = "";
     cells[i].style.removeProperty("background-color");
@@ -32,6 +34,34 @@ function turnClick(square) {
 
 // set the clicked square to the human and give it the 0 as turnClick
 function turn(squareId, player) {
-  orginalBoard[squareId] = player;
+  originalBoard[squareId] = player;
   document.getElementById(squareId).innerText = player;
+  let gameWon = checkWin(originalBoard, player);
+  if (gameWon) gameOver(gameWon);
+}
+
+function checkWin(board, player) {
+  // check every cell it is selected by the human player
+  let plays = board.reduce((a, e, i) => (e === player ? a.concat(i) : a), []);
+  // check if any of the selected cells are within winCombos
+  let gameWon = null; //tie
+  for (let [index, win] of winCombos.entries()) {
+    // does he plays in any of the winning conditions?
+    if (win.every((elem) => plays.indexOf(elem) > -1)) {
+      gameWon = { index: index, player: player };
+      break;
+    }
+  }
+  return gameWon; //tie or win
+}
+
+function gameOver(gameWon) {
+  for (let index of winCombos[gameWon.index]) {
+    document.getElementById(index).style.backgroundColor =
+      gameWon.player == Player ? "blue" : "red";
+  }
+
+  for (var i = 0; i < cells.length; i++) {
+    cells[i].removeEventListener("click", turnClick, false);
+  }
 }
