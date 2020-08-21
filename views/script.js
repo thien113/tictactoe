@@ -1,4 +1,5 @@
 var originalBoard;
+var gameAlreadyOver;
 const Player = "0";
 const aiPlayer = "X";
 const winCombos = [
@@ -16,6 +17,7 @@ const cells = document.querySelectorAll(".cell");
 startGame();
 
 function startGame() {
+  gameAlreadyOver = false;
   //clears the board
   document.querySelector(".endgame").style.display = "none";
   //fill number into array, and add eventlistener when clicking
@@ -31,7 +33,7 @@ function startGame() {
 function turnClick(square) {
   if (typeof originalBoard[square.target.id] == "number") {
     turn(square.target.id, Player);
-    if (!checkTie()) turn(bestSpot(), aiPlayer);
+    if (!gameAlreadyOver && !checkTie()) turn(bestSpot(), aiPlayer);
   }
 }
 
@@ -40,7 +42,10 @@ function turn(squareId, player) {
   originalBoard[squareId] = player;
   document.getElementById(squareId).innerText = player;
   let gameWon = checkWin(originalBoard, player);
-  if (gameWon) gameOver(gameWon);
+  if (gameWon) {
+    gameOver(gameWon);
+    gameAlreadyOver = true;
+  }
 }
 
 function checkWin(board, player) {
@@ -79,7 +84,7 @@ function emptySquares() {
   return originalBoard.filter((s) => typeof s == "number");
 }
 function bestSpot() {
-  return emptySquares()[0];
+  return minimax(originalBoard, aiPlayer).index;
 }
 
 function checkTie() {
@@ -92,4 +97,51 @@ function checkTie() {
     return true;
   }
   return false;
+}
+
+function minimax(newBoard, player) {
+  var availSpots = emptySquares(newBoard);
+
+  if (checkWin(newBoard, Player)) {
+    return { score: -10 };
+  } else if (checkWin(newBoard, aiPlayer)) {
+    return { score: 10 };
+  } else if (availSpots.length === 0) {
+    return { score: 0 };
+  }
+  var moves = [];
+  for (var i = 0; i < availSpots.length; i++) {
+    var move = {};
+    move.index = newBoard[availSpots[i]];
+    newBoard[availSpots[i]] = player;
+
+    if (player == aiPlayer) {
+      var result = minimax(newBoard, Player);
+      move.score = result.score;
+    } else {
+      var result = minimax(newBoard, aiPlayer);
+      move.score = result.score;
+    }
+    newBoard[availSpots[i]] = move.index;
+    moves.push(move);
+  }
+  var bestMove;
+  if (player === aiPlayer) {
+    var bestScore = -10000;
+    for (var i = 0; i < moves.length; i++) {
+      if (moves[i].score > bestScore) {
+        bestScore = moves[i].score;
+        bestMove = i;
+      }
+    }
+  } else {
+    var bestScore = 10000;
+    for (var i = 0; i < moves.length; i++) {
+      if (moves[i].score < bestScore) {
+        bestScore = moves[i].score;
+        bestMove = i;
+      }
+    }
+  }
+  return moves[bestMove];
 }
