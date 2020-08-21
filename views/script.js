@@ -29,7 +29,10 @@ function startGame() {
 
 // pass square with the td id and the human player
 function turnClick(square) {
-  turn(square.target.id, Player);
+  if (typeof originalBoard[square.target.id] == "number") {
+    turn(square.target.id, Player);
+    if (!checkTie()) turn(bestSpot(), aiPlayer);
+  }
 }
 
 // set the clicked square to the human and give it the 0 as turnClick
@@ -64,4 +67,29 @@ function gameOver(gameWon) {
   for (var i = 0; i < cells.length; i++) {
     cells[i].removeEventListener("click", turnClick, false);
   }
+  declareWinner(gameWon.player == Player ? "You win!" : "You lose!");
+}
+
+function declareWinner(who) {
+  document.querySelector(".endgame").style.display = "block";
+  document.querySelector(".endgame .text").innerText = who;
+}
+
+function emptySquares() {
+  return originalBoard.filter((s) => typeof s == "number");
+}
+function bestSpot() {
+  return emptySquares()[0];
+}
+
+function checkTie() {
+  if (emptySquares().length == 0) {
+    for (var i = 0; i < cells.length; i++) {
+      cells[i].style.backgroundColor = "green";
+      cells[i].removeEventListener("clicl", turnClick, false);
+    }
+    declareWinner("Tie Game!");
+    return true;
+  }
+  return false;
 }
