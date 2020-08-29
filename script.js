@@ -1,6 +1,6 @@
 var originalBoard;
 var gameAlreadyOver;
-const Player = "0";
+const Player = "O";
 const aiPlayer = "X";
 const winCombos = [
   [0, 1, 2],
