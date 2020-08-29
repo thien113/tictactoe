@@ -1,4 +1,4 @@
-### tictactoe
+# Tictactoe
 
 ## A simple TicTacToe Game
 
