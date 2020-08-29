@@ -1,5 +1,5 @@
-## Tictactoe
-# A simple TicTacToe Game
+# Tictactoe
+## A simple TicTacToe Game
 
 This game is coded with HTML5, CSS3 and Javascript. 
 Also with the MiniMax function I created the AI-Player to analyze all possible outcome. 
